@@ -1,0 +1,129 @@
+/* --------------------------------------------- */
+/*               TIPOGRAFÍA GLOBAL               */
+/* --------------------------------------------- */
+.root, .login-root, .login-card, .big-left-text, .big-left-text2, .login-field,
+.card-title, .input-label, .login-button, .app-name {
+    -fx-font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+/* --------------------------------------------- */
+/*           FONDO PRINCIPAL COMPLETO            */
+/* --------------------------------------------- */
+.login-root {
+    -fx-background-image: url("/org/example/images/library-blur.png");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+
+/* --------------------------------------------- */
+/*              BARRA SUPERIOR                   */
+/* --------------------------------------------- */
+.top-bar {
+    -fx-background-color: #13242C;
+    -fx-padding: 18 35;
+    -fx-min-height: 70;
+}
+
+.app-name {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: 600;
+}
+
+/* --------------------------------------------- */
+/*      TEXTO IZQUIERDO                          */
+/* --------------------------------------------- */
+.big-left-text {
+    -fx-text-fill: white;
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-line-spacing: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 25, 0, 0, 3);
+}
+
+.big-left-text2 {
+    -fx-text-fill: white;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: left;
+    -fx-line-spacing: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 25, 0, 0, 3);
+}
+
+/* --------------------------------------------- */
+/*         CARD TAMAÑO FIJO                      */
+/* --------------------------------------------- */
+.login-card {
+    -fx-background-color: rgba(18, 38, 48, 0.94);
+    -fx-background-radius: 35;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 40, 0, 0, 12);
+}
+
+/* --------------------------------------------- */
+/*               TITULO PRINCIPAL                */
+/* --------------------------------------------- */
+.card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+    -fx-alignment: center;
+}
+
+/* --------------------------------------------- */
+/*           LOGO CIRCULAR                       */
+/* --------------------------------------------- */
+.logo-container {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-background-radius: 70;
+    -fx-padding: 10;
+}
+
+/* --------------------------------------------- */
+/*        INPUTS CON PLACEHOLDER DENTRO          */
+/* --------------------------------------------- */
+.login-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #547082;
+    -fx-border-width: 0 0 1.5 0;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #7A8E9C;
+    -fx-font-size: 14px;
+    -fx-padding: 10 0 8 0;
+}
+
+.login-field:focused {
+    -fx-border-color: #4A9FD8;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* --------------------------------------------- */
+/*          BOTÓN LOGIN CON TAMAÑO FIJO          */
+/* --------------------------------------------- */
+.login-button {
+    -fx-background-color: #1A6080;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-background-radius: 22;
+    -fx-padding: 16 50;
+    -fx-min-width: 220;
+    -fx-pref-width: 220;
+    -fx-max-width: 220;
+    -fx-min-height: 48;
+    -fx-pref-height: 48;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    -fx-background-color: #227599;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.login-button:pressed {
+    -fx-background-color: #155066;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
