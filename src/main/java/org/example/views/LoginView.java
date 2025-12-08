@@ -39,7 +39,7 @@ public class LoginView {
         bookIcon.setFitHeight(40);
         bookIcon.setPreserveRatio(true);
 
-        Label appName = new Label("");
+        Label appName = new Label("BiblioSmart"); // Etiqueta de la app (basado en el PDF)
         appName.getStyleClass().add("app-name");
 
         topBar.getChildren().addAll(bookIcon, appName);
@@ -51,7 +51,7 @@ public class LoginView {
         centerBox.setPadding(new Insets(20, 80, 20, 80));
         centerBox.setSpacing(100);
 
-        // TEXTO IZQUIERDO
+        // TEXTO IZQUIERDO (Basado en el PDF, página 1)
         VBox leftText = new VBox();
         leftText.setAlignment(Pos.CENTER_LEFT);
         leftText.setSpacing(5);
@@ -86,8 +86,9 @@ public class LoginView {
         logoContainer.setPrefSize(140, 140);
         logoContainer.setMaxSize(140, 140);
 
+        // NOTA: Asumo que tienes una imagen llamada 'logo.png' o 'bibliosmart.png'
         ImageView logo = new ImageView(
-                new Image(getClass().getResource("/org/example/images/logo.png").toExternalForm())
+                new Image(getClass().getResource("/org/example/images/bibliosmart.png").toExternalForm())
         );
         logo.setFitWidth(120);
         logo.setFitHeight(120);
@@ -127,7 +128,8 @@ public class LoginView {
                 return;
             }
 
-            User user = loginController.authenticate(username, password);
+            // >>> CORRECCIÓN: Llamar al método handleLogin() <<<
+            User user = loginController.handleLogin(username, password);
 
             if (user != null) {
                 System.out.println("✅ Login exitoso: " + user.getNombre());

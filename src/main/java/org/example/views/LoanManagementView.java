@@ -1,5 +1,7 @@
 package org.example.views;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,14 +11,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.example.database.LoanData;
+import org.example.models.Loan;
 import org.example.models.User;
-// IMPORTANTE: Asegúrate de crear esta clase en org.example.models
-// import org.example.models.Loan;
+
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class LoanManagementView {
 
     private Stage stage;
     private User currentUser;
+    private TableView<Loan> loanTable;
+
+    // Formato de fecha para la UI
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public LoanManagementView(Stage stage, User user) {
         this.stage = stage;
@@ -99,51 +108,73 @@ public class LoanManagementView {
         subtitle.setStyle("-fx-text-fill: #A0AEC0; -fx-font-size: 18px;");
 
         // Tabla de Solicitudes Pendientes
-        TableView<Object> loanTable = createLoanTable();
+        loanTable = createLoanTable(); // Inicializar la tabla
+        loadPendingRequests();         // Cargar los datos
 
         content.getChildren().addAll(title, subtitle, loanTable);
         return content;
     }
 
-    // El tipo debe ser Loan cuando se cree el modelo: TableView<Loan>
-    private TableView<Object> createLoanTable() {
-        TableView<Object> table = new TableView<>();
+    private TableView<Loan> createLoanTable() {
+        TableView<Loan> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(450);
 
-        // Define las columnas de la tabla (basado en la maqueta)
-
-        TableColumn<Object, String> idClientCol = new TableColumn<>("id Cliente");
+        // Columnas
+        TableColumn<Loan, String> idClientCol = new TableColumn<>("id Cliente");
+        idClientCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
         idClientCol.setPrefWidth(80);
-        // idClientCol.setCellValueFactory(new PropertyValueFactory<>("clientId"));
 
-        TableColumn<Object, String> nameClientCol = new TableColumn<>("Nombre del Cliente");
+        // NOTA: Para obtener el nombre del cliente, se necesitaría un método en LoanData
+        // o UserData para buscar por ID de usuario. Usaremos el ID por simplicidad.
+        TableColumn<Loan, String> nameClientCol = new TableColumn<>("Nombre del Cliente");
+        nameClientCol.setCellValueFactory(new PropertyValueFactory<>("userId")); // Usamos ID como marcador de posición
         nameClientCol.setPrefWidth(180);
-        // nameClientCol.setCellValueFactory(new PropertyValueFactory<>("clientName"));
 
-        TableColumn<Object, String> idBookCol = new TableColumn<>("Id Libro");
+        TableColumn<Loan, Integer> idBookCol = new TableColumn<>("Id Libro");
+        idBookCol.setCellValueFactory(new PropertyValueFactory<>("bookId"));
         idBookCol.setPrefWidth(80);
-        // idBookCol.setCellValueFactory(new PropertyValueFactory<>("bookId"));
 
-        TableColumn<Object, String> titleCol = new TableColumn<>("Titulo");
+        // NOTA: Para obtener el título, se necesitaría buscar en BookData
+        TableColumn<Loan, String> titleCol = new TableColumn<>("Titulo");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("bookId")); // Usamos ID como marcador de posición
         titleCol.setPrefWidth(250);
-        // titleCol.setCellValueFactory(new PropertyValueFactory<>("bookTitle"));
 
-        TableColumn<Object, String> dateLoanCol = new TableColumn<>("Fecha Préstamo");
+        // Columna de Fecha de Préstamo (se personaliza para formato)
+        TableColumn<Loan, String> dateLoanCol = new TableColumn<>("Fecha Préstamo");
+        dateLoanCol.setCellValueFactory(cellData -> {
+            String formattedDate = cellData.getValue().getLoanDate().format(DATE_FORMATTER);
+            return new TableCell<Loan, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : formattedDate);
+                }
+            }.textProperty();
+        });
         dateLoanCol.setPrefWidth(120);
-        // dateLoanCol.setCellValueFactory(new PropertyValueFactory<>("requestDate"));
 
-        TableColumn<Object, String> dateLimitCol = new TableColumn<>("Fecha Límite");
+        // Columna de Fecha Límite (se personaliza para formato)
+        TableColumn<Loan, String> dateLimitCol = new TableColumn<>("Fecha Límite");
+        dateLimitCol.setCellValueFactory(cellData -> {
+            String formattedDate = cellData.getValue().getDueDate().format(DATE_FORMATTER);
+            return new TableCell<Loan, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : formattedDate);
+                }
+            }.textProperty();
+        });
         dateLimitCol.setPrefWidth(120);
-        // dateLimitCol.setCellValueFactory(new PropertyValueFactory<>("limitDate"));
 
         // Columna: Acciones (Aceptar/Rechazar)
-        TableColumn<Object, Void> actionsCol = new TableColumn<>("Acciones");
+        TableColumn<Loan, Void> actionsCol = new TableColumn<>("Acciones");
         actionsCol.setPrefWidth(180);
         actionsCol.setStyle("-fx-alignment: CENTER;");
 
         // CellFactory para los botones de Aceptar/Rechazar
-        actionsCol.setCellFactory(param -> new TableCell<Object, Void>() {
+        actionsCol.setCellFactory(param -> new TableCell<Loan, Void>() {
             private final HBox buttons = new HBox(5);
             private final Button acceptBtn = new Button("Aceptar");
             private final Button rejectBtn = new Button("Rechazar");
@@ -155,15 +186,25 @@ public class LoanManagementView {
                 buttons.setAlignment(Pos.CENTER);
                 buttons.getChildren().addAll(acceptBtn, rejectBtn);
 
-                // Lógica de acciones (Aquí irá la llamada al controlador de préstamos)
+                // --- LÓGICA DE GESTIÓN DE DATOS LOCALES ---
                 acceptBtn.setOnAction(event -> {
-                    // Lógica para ACEPTAR el préstamo
-                    System.out.println("Solicitud ACEPTADA");
+                    Loan loan = getTableView().getItems().get(getIndex());
+                    if (LoanData.approveLoan(loan.getId())) {
+                        showAlert("Éxito", "Préstamo aprobado para el libro ID: " + loan.getBookId(), Alert.AlertType.INFORMATION);
+                        loadPendingRequests(); // Recargar la tabla
+                    } else {
+                        showAlert("Error", "No se pudo aprobar el préstamo.", Alert.AlertType.ERROR);
+                    }
                 });
 
                 rejectBtn.setOnAction(event -> {
-                    // Lógica para RECHAZAR el préstamo
-                    System.out.println("Solicitud RECHAZADA");
+                    Loan loan = getTableView().getItems().get(getIndex());
+                    if (LoanData.rejectLoan(loan.getId())) {
+                        showAlert("Éxito", "Préstamo rechazado para el libro ID: " + loan.getBookId(), Alert.AlertType.INFORMATION);
+                        loadPendingRequests(); // Recargar la tabla
+                    } else {
+                        showAlert("Error", "No se pudo rechazar el préstamo.", Alert.AlertType.ERROR);
+                    }
                 });
             }
 
@@ -179,7 +220,22 @@ public class LoanManagementView {
         });
 
         table.getColumns().addAll(idClientCol, nameClientCol, idBookCol, titleCol, dateLoanCol, dateLimitCol, actionsCol);
-
         return table;
+    }
+
+    // Método para cargar los datos de solicitudes pendientes
+    private void loadPendingRequests() {
+        List<Loan> pendingLoans = LoanData.getPendingRequests();
+        ObservableList<Loan> data = FXCollections.observableArrayList(pendingLoans);
+        loanTable.setItems(data);
+    }
+
+    // Método auxiliar para mostrar alertas
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

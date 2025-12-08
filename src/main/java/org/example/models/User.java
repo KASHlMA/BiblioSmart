@@ -1,27 +1,27 @@
 package org.example.models;
 
 public class User {
-    private int id;
-    private String username;
+    private String id;
     private String nombre;
-    private String rol;
+    private String correo;
+    private String password;
+    private String rol; // USER, ADMIN, SUPERADMIN
 
-    public User(int id, String username, String nombre, String rol) {
+    public User(String id, String nombre, String correo, String password, String rol) {
         this.id = id;
-        this.username = username;
         this.nombre = nombre;
+        this.correo = correo;
+        this.password = password;
         this.rol = rol;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
+    // Getters (correctos)
+    public String getId() { return id; }
     public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
+    public String getCorreo() { return correo; }
+    public String getPassword() { return password; }
     public String getRol() { return rol; }
-    public void setRol(String rol) { this.rol = rol; }
+
+    // Setter (opcional, pero útil)
+    public void setId(String id) { this.id = id; }
 }

@@ -10,14 +10,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.models.User;
-// Se importan las nuevas clases de vista
-// import org.example.views.LoanManagementView;
-// import org.example.views.ReturnManagementView;
-// import org.example.views.UserHistoryView;
-// import org.example.views.ReportsView;
-// import org.example.views.LoginView;
-// import org.example.views.CatalogView;
-
+// IMPORTANTE: Asegúrate de que todas estas clases existan en org.example.views:
+// CatalogView, MyLoansView, LoanManagementView, ReturnManagementView, UserHistoryView, ReportsView, AddBookView, LoginView
 
 public class MainMenuView {
 
@@ -119,18 +113,30 @@ public class MainMenuView {
         String rol = currentUser.getRol();
 
         if (rol.equals("USER")) {
-            // USUARIO NORMAL
+            // USUARIO NORMAL - CONEXIONES COMPLETAS
             Button catalogBtn = createMenuButton("📚", "Catálogo de Libros", "#0E4F6E");
             Button myLoansBtn = createMenuButton("📋", "Mis Préstamos", "#1A6080");
 
             grid.add(catalogBtn, 0, 0);
             grid.add(myLoansBtn, 1, 0);
 
-            // TODO: Conectar catalogBtn a CatalogView.java
-            // TODO: Conectar myLoansBtn a MyLoansView.java
+            // 1. Conexión Catálogo
+            catalogBtn.setOnAction(e -> {
+                CatalogView catalogView = new CatalogView(stage, currentUser);
+                stage.setScene(catalogView.getScene());
+                stage.setTitle("BiblioSmart - Catálogo");
+            });
+
+            // 2. Conexión Mis Préstamos (Historial Activo)
+            myLoansBtn.setOnAction(e -> {
+                MyLoansView myLoansView = new MyLoansView(stage, currentUser);
+                stage.setScene(myLoansView.getScene());
+                stage.setTitle("BiblioSmart - Mis Préstamos");
+            });
+
 
         } else if (rol.equals("ADMIN")) {
-            // ADMINISTRADOR - Funcionalidades conectadas aquí:
+            // ADMINISTRADOR - CONEXIONES COMPLETAS
             Button catalogBtn = createMenuButton("📚", "Catálogo de Libros", "#0E4F6E");
             Button loansBtn = createMenuButton("📋", "Gestión de Préstamos", "#1A6080");
             Button returnsBtn = createMenuButton("✅", "Devoluciones", "#2C7A7B");
@@ -143,8 +149,6 @@ public class MainMenuView {
             grid.add(historyBtn, 1, 1);
             grid.add(statsBtn, 0, 2);
 
-            // --- CONEXIÓN DE BOTONES ADMIN ---
-
             // 1. Catálogo de Libros
             catalogBtn.setOnAction(e -> {
                 CatalogView catalogView = new CatalogView(stage, currentUser);
@@ -154,7 +158,6 @@ public class MainMenuView {
 
             // 2. Gestión de Préstamos
             loansBtn.setOnAction(e -> {
-                // Asegúrate de crear la clase LoanManagementView
                 LoanManagementView loansView = new LoanManagementView(stage, currentUser);
                 stage.setScene(loansView.getScene());
                 stage.setTitle("BiblioSmart - Gestión de Préstamos");
@@ -162,7 +165,6 @@ public class MainMenuView {
 
             // 3. Devoluciones
             returnsBtn.setOnAction(e -> {
-                // Asegúrate de crear la clase ReturnManagementView
                 ReturnManagementView returnsView = new ReturnManagementView(stage, currentUser);
                 stage.setScene(returnsView.getScene());
                 stage.setTitle("BiblioSmart - Gestión de Devoluciones");
@@ -170,7 +172,6 @@ public class MainMenuView {
 
             // 4. Historial de Usuarios
             historyBtn.setOnAction(e -> {
-                // Asegúrate de crear la clase UserHistoryView
                 UserHistoryView historyView = new UserHistoryView(stage, currentUser);
                 stage.setScene(historyView.getScene());
                 stage.setTitle("BiblioSmart - Historial de Usuarios");
@@ -178,7 +179,6 @@ public class MainMenuView {
 
             // 5. Estadísticas
             statsBtn.setOnAction(e -> {
-                // Asegúrate de crear la clase ReportsView
                 ReportsView reportsView = new ReportsView(stage, currentUser);
                 stage.setScene(reportsView.getScene());
                 stage.setTitle("BiblioSmart - Estadísticas y Reportes");
@@ -186,7 +186,7 @@ public class MainMenuView {
 
 
         } else if (rol.equals("SUPERADMIN")) {
-            // SUPER ADMINISTRADOR - Acceso completo
+            // SUPER ADMINISTRADOR - CONEXIONES COMPLETAS
             Button catalogBtn = createMenuButton("📚", "Catálogo de Libros", "#0E4F6E");
             Button addBookBtn = createMenuButton("➕", "Registrar Libro", "#38A169");
             Button loansBtn = createMenuButton("📋", "Gestión de Préstamos", "#1A6080");
@@ -201,7 +201,47 @@ public class MainMenuView {
             grid.add(historyBtn, 0, 2);
             grid.add(reportsBtn, 1, 2);
 
-            // TODO: Conectar los botones del SuperAdmin a sus respectivas vistas
+            // 1. Catálogo de Libros
+            catalogBtn.setOnAction(e -> {
+                CatalogView catalogView = new CatalogView(stage, currentUser);
+                stage.setScene(catalogView.getScene());
+                stage.setTitle("BiblioSmart - Catálogo");
+            });
+
+            // 2. Registrar Libro
+            addBookBtn.setOnAction(e -> {
+                AddBookView addBookView = new AddBookView(stage, currentUser);
+                stage.setScene(addBookView.getScene());
+                stage.setTitle("BiblioSmart - Registrar Libro");
+            });
+
+            // 3. Gestión de Préstamos
+            loansBtn.setOnAction(e -> {
+                LoanManagementView loansView = new LoanManagementView(stage, currentUser);
+                stage.setScene(loansView.getScene());
+                stage.setTitle("BiblioSmart - Gestión de Préstamos");
+            });
+
+            // 4. Devoluciones
+            returnsBtn.setOnAction(e -> {
+                ReturnManagementView returnsView = new ReturnManagementView(stage, currentUser);
+                stage.setScene(returnsView.getScene());
+                stage.setTitle("BiblioSmart - Gestión de Devoluciones");
+            });
+
+            // 5. Historial de Usuarios
+            historyBtn.setOnAction(e -> {
+                UserHistoryView historyView = new UserHistoryView(stage, currentUser);
+                stage.setScene(historyView.getScene());
+                stage.setTitle("BiblioSmart - Historial de Usuarios");
+            });
+
+            // 6. Reportes Completos
+            reportsBtn.setOnAction(e -> {
+                ReportsView reportsView = new ReportsView(stage, currentUser);
+                stage.setScene(reportsView.getScene());
+                stage.setTitle("BiblioSmart - Reportes Completos");
+            });
         }
 
         return grid;
@@ -250,11 +290,13 @@ public class MainMenuView {
         });
 
         // La acción temporal es eliminada para los botones del ADMIN y SuperADMIN
-        // pero se mantiene para USER para evitar errores hasta que implementes sus vistas.
+        // Aquí se mantiene la acción genérica para los roles USER que no tienen conexión explícita.
         if (currentUser.getRol().equals("USER")) {
-            btn.setOnAction(e -> {
-                System.out.println("Clic en: " + text + " (Vista en desarrollo)");
-            });
+            // Si bien ya conectamos Catalogo y Mis Préstamos, mantenemos este bloque si hubiera
+            // otro botón USER pendiente de implementación. En tu caso, ya no es necesario
+            // ya que todos los botones de USER están conectados arriba.
+            // Dejamos la acción vacía para evitar warnings si no se usa la acción temporal.
+            btn.setOnAction(e -> {});
         }
 
         return btn;

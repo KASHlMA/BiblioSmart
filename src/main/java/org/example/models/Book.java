@@ -9,6 +9,10 @@ public class Book {
     private boolean disponible;
     private String isbn;
 
+    // Atributos adicionales que otras vistas pueden usar
+    private String estado;
+
+    // Constructor (adaptado al formato de tu BookData)
     public Book(int id, String titulo, String autor, String editorial, String categoria, boolean disponible, String isbn) {
         this.id = id;
         this.titulo = titulo;
@@ -17,37 +21,34 @@ public class Book {
         this.categoria = categoria;
         this.disponible = disponible;
         this.isbn = isbn;
+        this.estado = disponible ? "Disponible" : "Prestado";
     }
 
-    // Getters y Setters
+    // --- GETTERS (Necesarios para la tabla y lectura) ---
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
     public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
-
     public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
-
     public String getEditorial() { return editorial; }
-    public void setEditorial(String editorial) { this.editorial = editorial; }
-
     public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
-
     public boolean isDisponible() { return disponible; }
-    public void setDisponible(boolean disponible) { this.disponible = disponible; }
-
     public String getIsbn() { return isbn; }
-    public void setIsbn(String isbn) { this.isbn = isbn; }
+    public String getEstado() { return estado; }
 
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", titulo='" + titulo + '\'' +
-                ", autor='" + autor + '\'' +
-                ", disponible=" + disponible +
-                '}';
+    // --- SETTERS (Necesarios para la Gestión de Datos) ---
+
+    // 1. Método faltante para resolver el error de BookData.addBook()
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // 2. Métodos para LoanData para cambiar la disponibilidad
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+        this.estado = disponible ? "Disponible" : "Prestado";
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+        this.disponible = estado.equals("Disponible");
     }
 }
