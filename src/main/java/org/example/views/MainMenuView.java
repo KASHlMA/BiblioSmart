@@ -10,8 +10,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.models.User;
+// Se importan las nuevas clases de vista
+// import org.example.views.LoanManagementView;
+// import org.example.views.ReturnManagementView;
+// import org.example.views.UserHistoryView;
+// import org.example.views.ReportsView;
+// import org.example.views.LoginView;
+// import org.example.views.CatalogView;
 
-import static java.awt.SystemColor.text;
 
 public class MainMenuView {
 
@@ -92,6 +98,7 @@ public class MainMenuView {
                         "-fx-cursor: hand;"
         );
 
+        // Clic en Cerrar Sesión
         logoutBtn.setOnAction(e -> {
             LoginView loginView = new LoginView(stage);
             stage.setScene(loginView.getScene());
@@ -112,15 +119,18 @@ public class MainMenuView {
         String rol = currentUser.getRol();
 
         if (rol.equals("USER")) {
-            // USUARIO NORMAL - Solo puede ver catálogo y sus préstamos
+            // USUARIO NORMAL
             Button catalogBtn = createMenuButton("📚", "Catálogo de Libros", "#0E4F6E");
             Button myLoansBtn = createMenuButton("📋", "Mis Préstamos", "#1A6080");
 
             grid.add(catalogBtn, 0, 0);
             grid.add(myLoansBtn, 1, 0);
 
+            // TODO: Conectar catalogBtn a CatalogView.java
+            // TODO: Conectar myLoansBtn a MyLoansView.java
+
         } else if (rol.equals("ADMIN")) {
-            // ADMINISTRADOR - Gestiona préstamos, devoluciones, historial y estadísticas
+            // ADMINISTRADOR - Funcionalidades conectadas aquí:
             Button catalogBtn = createMenuButton("📚", "Catálogo de Libros", "#0E4F6E");
             Button loansBtn = createMenuButton("📋", "Gestión de Préstamos", "#1A6080");
             Button returnsBtn = createMenuButton("✅", "Devoluciones", "#2C7A7B");
@@ -132,6 +142,48 @@ public class MainMenuView {
             grid.add(returnsBtn, 0, 1);
             grid.add(historyBtn, 1, 1);
             grid.add(statsBtn, 0, 2);
+
+            // --- CONEXIÓN DE BOTONES ADMIN ---
+
+            // 1. Catálogo de Libros
+            catalogBtn.setOnAction(e -> {
+                CatalogView catalogView = new CatalogView(stage, currentUser);
+                stage.setScene(catalogView.getScene());
+                stage.setTitle("BiblioSmart - Catálogo");
+            });
+
+            // 2. Gestión de Préstamos
+            loansBtn.setOnAction(e -> {
+                // Asegúrate de crear la clase LoanManagementView
+                LoanManagementView loansView = new LoanManagementView(stage, currentUser);
+                stage.setScene(loansView.getScene());
+                stage.setTitle("BiblioSmart - Gestión de Préstamos");
+            });
+
+            // 3. Devoluciones
+            returnsBtn.setOnAction(e -> {
+                // Asegúrate de crear la clase ReturnManagementView
+                ReturnManagementView returnsView = new ReturnManagementView(stage, currentUser);
+                stage.setScene(returnsView.getScene());
+                stage.setTitle("BiblioSmart - Gestión de Devoluciones");
+            });
+
+            // 4. Historial de Usuarios
+            historyBtn.setOnAction(e -> {
+                // Asegúrate de crear la clase UserHistoryView
+                UserHistoryView historyView = new UserHistoryView(stage, currentUser);
+                stage.setScene(historyView.getScene());
+                stage.setTitle("BiblioSmart - Historial de Usuarios");
+            });
+
+            // 5. Estadísticas
+            statsBtn.setOnAction(e -> {
+                // Asegúrate de crear la clase ReportsView
+                ReportsView reportsView = new ReportsView(stage, currentUser);
+                stage.setScene(reportsView.getScene());
+                stage.setTitle("BiblioSmart - Estadísticas y Reportes");
+            });
+
 
         } else if (rol.equals("SUPERADMIN")) {
             // SUPER ADMINISTRADOR - Acceso completo
@@ -148,6 +200,8 @@ public class MainMenuView {
             grid.add(returnsBtn, 1, 1);
             grid.add(historyBtn, 0, 2);
             grid.add(reportsBtn, 1, 2);
+
+            // TODO: Conectar los botones del SuperAdmin a sus respectivas vistas
         }
 
         return grid;
@@ -195,10 +249,13 @@ public class MainMenuView {
             );
         });
 
-        // Acción temporal
-        btn.setOnAction(e -> {
-            System.out.println("Clic en: " + text + " (Vista en desarrollo)");
-        });
+        // La acción temporal es eliminada para los botones del ADMIN y SuperADMIN
+        // pero se mantiene para USER para evitar errores hasta que implementes sus vistas.
+        if (currentUser.getRol().equals("USER")) {
+            btn.setOnAction(e -> {
+                System.out.println("Clic en: " + text + " (Vista en desarrollo)");
+            });
+        }
 
         return btn;
     }
