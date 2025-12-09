@@ -130,4 +130,8 @@ public class LoanData {
                 .findFirst()
                 .orElse(null);
     }
+    public static List<Loan> getAll() {
+        return LocalDatabase.loans;
+    }
+
 }

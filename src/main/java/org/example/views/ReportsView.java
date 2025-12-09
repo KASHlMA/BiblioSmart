@@ -3,7 +3,8 @@ package org.example.views;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -32,8 +33,7 @@ public class ReportsView {
         VBox centerContent = createCenterContent();
         root.setCenter(centerContent);
 
-        Scene scene = new Scene(root, 1150, 720);
-        return scene;
+        return new Scene(root, 1150, 720);
     }
 
     private HBox createTopBar() {
@@ -43,7 +43,6 @@ public class ReportsView {
         topBar.setPadding(new Insets(18, 35, 18, 35));
         topBar.setSpacing(20);
 
-        // Icono y nombre de la App
         ImageView bookIcon = new ImageView(
                 new Image(getClass().getResource("/org/example/images/bibliosmart.png").toExternalForm())
         );
@@ -56,7 +55,7 @@ public class ReportsView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Botón Regresar (al menú principal del Admin)
+        // Botón Regresar
         Button backBtn = new Button("← Regresar");
         backBtn.setStyle(
                 "-fx-background-color: #0E4F6E; " +
@@ -66,7 +65,6 @@ public class ReportsView {
                         "-fx-background-radius: 20; " +
                         "-fx-cursor: hand;"
         );
-
         backBtn.setOnAction(e -> {
             MainMenuView menuView = new MainMenuView(stage, currentUser);
             stage.setScene(menuView.getScene());
@@ -82,7 +80,6 @@ public class ReportsView {
         content.setPadding(new Insets(50));
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Título de la página
         Label title = new Label("Reportes y Estadísticas de la Biblioteca");
         title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
 
@@ -92,15 +89,12 @@ public class ReportsView {
         HBox reportOptions = new HBox(40);
         reportOptions.setAlignment(Pos.CENTER);
 
-        // Botón: Generar reporte de libros prestados (Página 19)
         Button prestadosBtn = createReportButton("Generar Reporte de Préstamos Activos", "#1A6080");
-
-        // Botón: Generar reporte de libros devueltos (Página 19)
         Button devueltosBtn = createReportButton("Generar Reporte de Devoluciones", "#2C7A7B");
 
         reportOptions.getChildren().addAll(prestadosBtn, devueltosBtn);
-
         content.getChildren().addAll(title, subtitle, reportOptions);
+
         return content;
     }
 
@@ -118,9 +112,13 @@ public class ReportsView {
         );
 
         btn.setOnAction(e -> {
-            // TODO: Lógica para generar y descargar un archivo (CSV/PDF)
-            System.out.println("Generando reporte: " + text);
+            if (text.contains("Préstamos")) {
+                new LoansReportTableView(stage, currentUser).show();
+            } else {
+                new ReturnsReportTableView(stage, currentUser).show();
+            }
         });
+
         return btn;
     }
 }
