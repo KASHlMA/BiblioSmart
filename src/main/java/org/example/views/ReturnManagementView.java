@@ -9,9 +9,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.example.database.LoanData;
+import org.example.models.Loan;
 import org.example.models.User;
-// IMPORTANTE: Se necesitará el modelo de Loan para llenar esta tabla
-// import org.example.models.Loan;
 
 public class ReturnManagementView {
 
@@ -27,11 +27,9 @@ public class ReturnManagementView {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #0B1C26;");
 
-        // 1. BARRA SUPERIOR (Común)
         HBox topBar = createTopBar();
         root.setTop(topBar);
 
-        // 2. CONTENIDO CENTRAL
         VBox centerContent = createCenterContent();
 
         ScrollPane scrollPane = new ScrollPane(centerContent);
@@ -40,8 +38,7 @@ public class ReturnManagementView {
 
         root.setCenter(scrollPane);
 
-        Scene scene = new Scene(root, 1150, 720);
-        return scene;
+        return new Scene(root, 1150, 720);
     }
 
     private HBox createTopBar() {
@@ -51,7 +48,6 @@ public class ReturnManagementView {
         topBar.setPadding(new Insets(18, 35, 18, 35));
         topBar.setSpacing(20);
 
-        // Icono y nombre de la App
         ImageView bookIcon = new ImageView(
                 new Image(getClass().getResource("/org/example/images/bibliosmart.png").toExternalForm())
         );
@@ -64,7 +60,6 @@ public class ReturnManagementView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Botón Regresar (al menú principal del Admin)
         Button backBtn = new Button("← Regresar");
         backBtn.setStyle(
                 "-fx-background-color: #0E4F6E; " +
@@ -78,7 +73,6 @@ public class ReturnManagementView {
         backBtn.setOnAction(e -> {
             MainMenuView menuView = new MainMenuView(stage, currentUser);
             stage.setScene(menuView.getScene());
-            stage.setTitle("BiblioSmart - Menú Principal");
         });
 
         topBar.getChildren().addAll(bookIcon, appName, spacer, backBtn);
@@ -90,82 +84,86 @@ public class ReturnManagementView {
         content.setPadding(new Insets(30, 50, 30, 50));
         content.setAlignment(Pos.TOP_CENTER);
 
-        // Título de la página
         Label title = new Label("Gestión de Devoluciones de Libros");
         title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
 
-        // Subtítulo
         Label subtitle = new Label("Confirmación de devoluciones recibidas");
         subtitle.setStyle("-fx-text-fill: #A0AEC0; -fx-font-size: 18px;");
 
-        // 3. Tabla de Solicitudes de Devolución
-        TableView<Object> returnTable = createReturnTable();
+        TableView<Loan> returnTable = createReturnTable();
 
         content.getChildren().addAll(title, subtitle, returnTable);
         return content;
     }
 
-    private TableView<Object> createReturnTable() {
-        TableView<Object> table = new TableView<>();
+    private TableView<Loan> createReturnTable() {
+
+        TableView<Loan> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(450);
 
-        // Columnas basadas en la maqueta de Gestión de devoluciones de libros (página 21)
+        // COLUMNAS
+        TableColumn<Loan, Integer> idLoanCol = new TableColumn<>("ID Préstamo");
+        idLoanCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<Object, String> idLoanCol = new TableColumn<>("id préstamo");
-        // idLoanCol.setCellValueFactory(new PropertyValueFactory<>("loanId"));
+        TableColumn<Loan, String> idUserCol = new TableColumn<>("ID Usuario");
+        idUserCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
 
-        TableColumn<Object, String> idUserCol = new TableColumn<>("Id usuario");
-        // idUserCol.setCellValueFactory(new PropertyValueFactory<>("clientId"));
+        TableColumn<Loan, Integer> idBookCol = new TableColumn<>("ID Libro");
+        idBookCol.setCellValueFactory(new PropertyValueFactory<>("bookId"));
 
-        TableColumn<Object, String> idBookCol = new TableColumn<>("Id Libro");
-        // idBookCol.setCellValueFactory(new PropertyValueFactory<>("bookId"));
+        TableColumn<Loan, String> titleCol = new TableColumn<>("Título");
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("bookTitle"));
 
-        TableColumn<Object, String> titleCol = new TableColumn<>("Titulo");
-        // titleCol.setCellValueFactory(new PropertyValueFactory<>("bookTitle"));
+        TableColumn<Loan, String> dateLoanCol = new TableColumn<>("Fecha Préstamo");
+        dateLoanCol.setCellValueFactory(new PropertyValueFactory<>("requestDate"));
 
-        TableColumn<Object, String> dateLoanCol = new TableColumn<>("Fecha Préstamo");
-        // dateLoanCol.setCellValueFactory(new PropertyValueFactory<>("requestDate"));
+        TableColumn<Loan, String> dateLimitCol = new TableColumn<>("Fecha Límite");
+        dateLimitCol.setCellValueFactory(new PropertyValueFactory<>("limitDate"));
 
-        TableColumn<Object, String> dateLimitCol = new TableColumn<>("Fecha Límite");
-        // dateLimitCol.setCellValueFactory(new PropertyValueFactory<>("limitDate"));
+        TableColumn<Loan, String> dateReturnCol = new TableColumn<>("Fecha Devolución");
+        dateReturnCol.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
 
-        TableColumn<Object, String> dateReturnCol = new TableColumn<>("Fecha Devolución");
-        // dateReturnCol.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
-
-        // Columna para la acción de Confirmar Devolución
-        TableColumn<Object, Void> actionsCol = new TableColumn<>("Confirmar");
-        actionsCol.setStyle("-fx-alignment: CENTER;");
-
-        // CellFactory para el botón de Confirmar
-        actionsCol.setCellFactory(param -> new TableCell<Object, Void>() {
+        // COLUMNA DE BOTÓN
+        TableColumn<Loan, Void> actionsCol = new TableColumn<>("Confirmar");
+        actionsCol.setCellFactory(param -> new TableCell<>() {
             private final Button confirmBtn = new Button("Confirmar Devolución");
 
             {
                 confirmBtn.setStyle("-fx-background-color: #38A169; -fx-text-fill: white; -fx-cursor: hand;");
 
-                // Lógica de acciones
                 confirmBtn.setOnAction(event -> {
-                    // Object loan = getTableView().getItems().get(getIndex());
-                    // Lógica del controlador para CONFIRMAR y actualizar el estado del libro a "Disponible"
-                    System.out.println("Devolución CONFIRMADA");
+                    Loan loan = getTableView().getItems().get(getIndex());
+
+                    boolean success = LoanData.confirmReturn(loan.getId());
+
+                    if (success) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Devolución registrada");
+                        alert.setHeaderText(null);
+                        alert.setContentText("La devolución del libro fue confirmada.");
+                        alert.showAndWait();
+
+                        // Recargar la tabla
+                        getTableView().getItems().remove(loan);
+                    }
                 });
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(confirmBtn);
-                }
+                setGraphic(empty ? null : confirmBtn);
             }
         });
 
-        table.getColumns().addAll(idLoanCol, idUserCol, idBookCol, titleCol, dateLoanCol, dateLimitCol, dateReturnCol, actionsCol);
+        table.getColumns().addAll(
+                idLoanCol, idUserCol, idBookCol, titleCol,
+                dateLoanCol, dateLimitCol, dateReturnCol, actionsCol
+        );
 
-        // TODO: Cargar datos de solicitudes de devolución pendientes (LoanStatus = 'SOLICITUD_DEVOLUCION')
+        // CARGAR DATOS reales desde LoanData
+        table.getItems().setAll(LoanData.getReturnRequests());
 
         return table;
     }

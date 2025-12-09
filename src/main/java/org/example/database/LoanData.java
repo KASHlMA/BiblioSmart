@@ -116,6 +116,13 @@ public class LoanData {
                 .filter(loan -> loan.getUserId().equalsIgnoreCase(userId))
                 .collect(Collectors.toList());
     }
+    public static List<Loan> getPendingReturnRequests() {
+        return LocalDatabase.loans.stream()
+                .filter(l -> l.getStatus().equals("RETURN_REQUESTED"))
+                .collect(Collectors.toList());
+    }
+
+
 
     public static Loan getLoanById(int id) {
         return LocalDatabase.loans.stream()

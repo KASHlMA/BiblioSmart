@@ -35,6 +35,11 @@ public class Book {
     public String getEstado() { return estado; }
 
     // --- SETTERS (Necesarios para la Gestión de Datos) ---
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setAutor(String autor) { this.autor = autor; }
+    public void setEditorial(String editorial) { this.editorial = editorial; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
 
     // 1. Método faltante para resolver el error de BookData.addBook()
     public void setId(int id) {

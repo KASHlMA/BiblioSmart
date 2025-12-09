@@ -191,14 +191,14 @@ public class MainMenuView {
             Button addBookBtn = createMenuButton("➕", "Registrar Libro", "#38A169");
             Button loansBtn = createMenuButton("📋", "Gestión de Préstamos", "#1A6080");
             Button returnsBtn = createMenuButton("✅", "Devoluciones", "#2C7A7B");
-            Button historyBtn = createMenuButton("👥", "Historial de Usuarios", "#6B46C1");
+            Button manageUsersBtn = createMenuButton("👥", "Gestión de Usuarios", "#6B46C1");
             Button reportsBtn = createMenuButton("📊", "Reportes Completos", "#5A67D8");
 
             grid.add(catalogBtn, 0, 0);
             grid.add(addBookBtn, 1, 0);
             grid.add(loansBtn, 0, 1);
             grid.add(returnsBtn, 1, 1);
-            grid.add(historyBtn, 0, 2);
+            grid.add(manageUsersBtn, 0, 2);
             grid.add(reportsBtn, 1, 2);
 
             // 1. Catálogo de Libros
@@ -229,11 +229,11 @@ public class MainMenuView {
                 stage.setTitle("BiblioSmart - Gestión de Devoluciones");
             });
 
-            // 5. Historial de Usuarios
-            historyBtn.setOnAction(e -> {
-                UserHistoryView historyView = new UserHistoryView(stage, currentUser);
-                stage.setScene(historyView.getScene());
-                stage.setTitle("BiblioSmart - Historial de Usuarios");
+            // 5. Gestión de Usuarios
+            manageUsersBtn.setOnAction(e -> {
+                UserManagementView userView = new UserManagementView(stage, currentUser);
+                stage.setScene(userView.getScene());
+                stage.setTitle("BiblioSmart - Gestión de Usuarios");
             });
 
             // 6. Reportes Completos

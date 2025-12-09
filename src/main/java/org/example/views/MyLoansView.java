@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import org.example.database.LoanData;
+import org.example.database.LocalDatabase;
 import org.example.models.Loan;
 import org.example.models.User;
 
@@ -46,8 +47,7 @@ public class MyLoansView {
 
         root.setCenter(scrollPane);
 
-        Scene scene = new Scene(root, 1150, 720);
-        return scene;
+        return new Scene(root, 1150, 720);
     }
 
     private HBox createTopBar() {
@@ -69,7 +69,6 @@ public class MyLoansView {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Botón Regresar al Menú Principal
         Button backBtn = new Button("← Regresar");
         backBtn.setStyle(
                 "-fx-background-color: #0E4F6E; " +
@@ -98,7 +97,7 @@ public class MyLoansView {
         Label title = new Label("Mi Historial de Préstamos");
         title.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
 
-        Label subtitle = new Label("Aquí puedes ver tus libros activos y solicitar su devolución.");
+        Label subtitle = new Label("Aquí puedes ver tus libros activos, solicitar su devolución o cancelar solicitudes pendientes.");
         subtitle.setStyle("-fx-text-fill: #A0AEC0; -fx-font-size: 18px;");
 
         loansTable = createLoansTable();
@@ -113,8 +112,8 @@ public class MyLoansView {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.setPrefHeight(450);
 
-        // Columnas
-        TableColumn<Loan, Integer> idLoanCol = new TableColumn<>("id Préstamo");
+        // Columnas básicas
+        TableColumn<Loan, Integer> idLoanCol = new TableColumn<>("ID Préstamo");
         idLoanCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Loan, String> titleCol = new TableColumn<>("Libro");
@@ -123,18 +122,13 @@ public class MyLoansView {
         TableColumn<Loan, String> statusCol = new TableColumn<>("Estado");
         statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Columna Fecha Préstamo (formateada)
         TableColumn<Loan, String> dateLoanCol = createDateColumn("Fecha Solicitud", "loanDate");
-
-        // Columna Fecha Límite (formateada)
         TableColumn<Loan, String> dateLimitCol = createDateColumn("Fecha Límite", "dueDate");
 
-        // Columna para la acción de Devolución
-        TableColumn<Loan, Void> actionsCol = new TableColumn<>("Devolución");
-        actionsCol.setStyle("-fx-alignment: CENTER;");
-
-        // CellFactory para el botón de Solicitar Devolución
-        actionsCol.setCellFactory(param -> new TableCell<Loan, Void>() {
+        // Botón para Solicitar Devolución (solo APROBADOS)
+        TableColumn<Loan, Void> returnCol = new TableColumn<>("Devolución");
+        returnCol.setStyle("-fx-alignment: CENTER;");
+        returnCol.setCellFactory(param -> new TableCell<Loan, Void>() {
             private final Button returnBtn = new Button("Solicitar Devolución");
 
             {
@@ -145,7 +139,7 @@ public class MyLoansView {
                     if (loan.getStatus().equals("APPROVED")) {
                         if (LoanData.requestReturn(loan.getId())) {
                             showAlert("Solicitud Enviada", "Solicitud de devolución enviada al administrador.", Alert.AlertType.INFORMATION);
-                            loadMyLoans(); // Recargar la tabla para actualizar el estado
+                            loadMyLoans();
                         }
                     } else if (loan.getStatus().equals("RETURN_REQUESTED")) {
                         showAlert("Información", "Ya enviaste una solicitud de devolución.", Alert.AlertType.WARNING);
@@ -159,17 +153,43 @@ public class MyLoansView {
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
                 Loan loan = empty ? null : getTableView().getItems().get(getIndex());
-
-                // Mostrar el botón solo si el préstamo está APROBADO
-                if (empty || loan == null || !loan.getStatus().equals("APPROVED")) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(returnBtn);
-                }
+                setGraphic(empty || loan == null || !loan.getStatus().equals("APPROVED") ? null : returnBtn);
             }
         });
 
-        table.getColumns().addAll(idLoanCol, titleCol, statusCol, dateLoanCol, dateLimitCol, actionsCol);
+        // Botón para Cancelar Solicitud (solo PENDING)
+        TableColumn<Loan, Void> cancelCol = new TableColumn<>("Cancelar");
+        cancelCol.setStyle("-fx-alignment: CENTER;");
+        cancelCol.setCellFactory(param -> new TableCell<Loan, Void>() {
+            private final Button cancelBtn = new Button("Cancelar Solicitud");
+
+            {
+                cancelBtn.setStyle("-fx-background-color: #E53E3E; -fx-text-fill: white; -fx-cursor: hand;");
+                cancelBtn.setOnAction(event -> {
+                    Loan loan = getTableView().getItems().get(getIndex());
+                    if (loan.getStatus().equals("PENDING")) {
+                        loan.setStatus("REJECTED");
+                        LocalDatabase.books.stream()
+                                .filter(b -> b.getId() == loan.getBookId())
+                                .findFirst()
+                                .ifPresent(b -> b.setDisponible(true));
+                        showAlert("Solicitud Cancelada", "Tu solicitud para '" + loan.getBookTitle() + "' ha sido cancelada.", Alert.AlertType.INFORMATION);
+                        loadMyLoans();
+                    } else {
+                        showAlert("No Cancelable", "Solo puedes cancelar solicitudes pendientes.", Alert.AlertType.WARNING);
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                Loan loan = empty ? null : getTableView().getItems().get(getIndex());
+                setGraphic(empty || loan == null || !loan.getStatus().equals("PENDING") ? null : cancelBtn);
+            }
+        });
+
+        table.getColumns().addAll(idLoanCol, titleCol, statusCol, dateLoanCol, dateLimitCol, returnCol, cancelCol);
         return table;
     }
 
@@ -180,27 +200,17 @@ public class MyLoansView {
             java.time.LocalDate date = null;
             if (propertyName.equals("loanDate")) date = loan.getLoanDate();
             else if (propertyName.equals("dueDate")) date = loan.getDueDate();
-
             String formattedDate = (date != null) ? date.format(DATE_FORMATTER) : "N/A";
-            return new TableCell<Loan, String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    setText(empty ? null : formattedDate);
-                }
-            }.textProperty();
+            return new javafx.beans.property.SimpleStringProperty(formattedDate);
         });
         return column;
     }
 
     private void loadMyLoans() {
-        // Cargar todos los préstamos relevantes del usuario
-        List<Loan> myActiveLoans = LoanData.getHistoryByUserId(currentUser.getId()).stream()
-                // Filtramos solo los que están en proceso o activos (PENDING, APPROVED, RETURN_REQUESTED)
+        List<Loan> myLoans = LoanData.getHistoryByUserId(currentUser.getId()).stream()
                 .filter(loan -> !loan.getStatus().equals("RETURNED") && !loan.getStatus().equals("REJECTED"))
                 .collect(Collectors.toList());
-
-        ObservableList<Loan> data = FXCollections.observableArrayList(myActiveLoans);
+        ObservableList<Loan> data = FXCollections.observableArrayList(myLoans);
         loansTable.setItems(data);
     }
 

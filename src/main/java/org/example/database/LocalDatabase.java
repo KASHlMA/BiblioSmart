@@ -17,9 +17,10 @@ public class LocalDatabase {
     // Bloque estático para inicializar datos de prueba
     static {
         // --- DATOS DE USUARIO ---
-        users.add(new User("U-04", "Erick Montiel Campos", "user", "root", "USER")); // Contraseña "root"
-        users.add(new User("A-01", "Admin General", "admin", "admin", "ADMIN")); // Contraseña "admin"
-        users.add(new User("S-01", "Super Admin", "super", "super", "SUPERADMIN")); // Contraseña "super"
+        users.add(new User("U-04", "Erick Montiel Campos", "user", "root", "USER", "ACTIVO"));
+        users.add(new User("A-01", "Admin General", "admin", "admin", "ADMIN", "ACTIVO"));
+        users.add(new User("S-01", "Super Admin", "super", "super", "SUPERADMIN", "ACTIVO"));
+        // Contraseña "super"
 
         // --- DATOS DE LIBROS (Usando el constructor simple de tu BookData) ---
         books.add(new Book(1, "El Señor de los Anillos", "J.R.R. Tolkien", "Minotauro", "Fantasía", true, "978-8445071796"));

@@ -70,6 +70,11 @@ public class BookData {
      * Registra un nuevo libro en la base de datos local (usado por SuperAdmin).
      * Asigna un ID al libro antes de añadirlo.
      */
+    public static void removeBook(int bookId) {
+     LocalDatabase.books.removeIf(book -> book.getId() == bookId);
+
+     }
+
     public static void addBook(Book newBook) {
         // Genera un nuevo ID basado en el máximo actual + 1
         int newId = LocalDatabase.books.stream()
